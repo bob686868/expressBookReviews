@@ -64,14 +64,21 @@ public_users.get('/author/:author',function (req, res) {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title',async function (req, res) {
   let title=req.params.title
-  for(key of Object.keys(books)){
-    if(books[key]["title"]==title){
-      return res.send(JSON.stringify(books[key]))
-    }
+  try {  
+    let data=await new Promise((resolve,reject)=>{    
+      for(key of Object.keys(books)){
+        if(books[key]["title"]==title){
+          resolve(books[key])
+        }
+      }
+      reject("book not found")
+    })
+    res.send(JSON.stringify(data,null,4))
+  } catch (error) {
+    res.status(404).send("book not found")
   }
- return res.status(404).send("title not available")
 });
 
 //  Get book review
